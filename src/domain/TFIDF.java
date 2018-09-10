@@ -13,16 +13,21 @@ public class TFIDF {
     private Map<String, Double> wijConsulta = new TreeMap<>();
     private ArrayList<Rank> ranking = new ArrayList<>();
 
-    public TFIDF(String path) {
+    private ArrayList<Map<String,ArrayList<Map<String,Double>>>> historico = new ArrayList<>();
+    //private Map<String,ArrayList<Map<String,Double[]>>> historicoTerm = new TreeMap<>();
+    private Map<String,Double[]> historicoTerm = new TreeMap<>();
+
+    public TFIDF(String path, Map<String,Integer> dicConsulta) {
         FileManager fm = new FileManager();
         this.diccionarioGeneral = fm.readDiccionarioGeneral(path+"\\DiccionarioGeneral");
-        this.diccionarioConsulta = fm.readConsulta(path+"\\DiccionarioConsulta");
+        this.diccionarioConsulta = dicConsulta;
         VectorialStruct t = this.diccionarioGeneral.get("!").get(0);
         if (t.getPath().equals("!")){
             this.N = t.getCantidad();
             this.diccionarioGeneral.remove("!");
         }
         getDiccionarioArchivos();
+
     }
 
     public TFIDF(Map<String, ArrayList<VectorialStruct>> diccionarioGeneral, Map<String, Integer> diccionarioConsulta, int N) {
@@ -43,15 +48,21 @@ public class TFIDF {
     public Double getWij(String word,String documentoPath){
         ArrayList<VectorialStruct>  vs = this.diccionarioGeneral.get(word);
         int freqij =0;
-        int ni=0;
+        Double ni=0.0;
         if(vs != null && vs.size()>0){
-            ni = vs.size();
+            ni = vs.size()*1.0;
+            Double idf = getIDF(ni.intValue());
+            Double[] t = {ni,idf};
+
+            if(!historicoTerm.containsKey(word)){
+                historicoTerm.put(word,t);
+            }
             for(VectorialStruct vv : vs){
                 if(vv.getPath().equals(documentoPath)){
                     freqij = vv.getCantidad();
                 }
             }
-            return getTF(freqij)*getIDF(ni);
+            return getTF(freqij)*idf;
         }
         return 0.0;
     }
@@ -72,6 +83,7 @@ public class TFIDF {
     }
     public Map<String,Double> getNormas(){
         Map<String,Double> map = new TreeMap<>();
+        Map<String,ArrayList<Map<String,Double>>> pesos = new TreeMap<>();
         for(String path : this.diccionarioArchivos.keySet()){
             Double norma = 0.0;
             for(VectorialStruct vs: this.diccionarioArchivos.get(path)){
@@ -93,6 +105,10 @@ public class TFIDF {
             norma = Math.sqrt(norma);
             map.put(path,norma);
         }
+        for(String a : wijCalculada.keySet()){
+            pesos.put(a,new ArrayList<>(wijCalculada.get(a)));
+        }
+        historico.add(pesos);
         return map;
     }
     public Double getNormaConsulta(){
@@ -131,6 +147,8 @@ public class TFIDF {
                 }
             }
         }
+        Map<String,ArrayList<Map<String,Double>>> normalizada =  new TreeMap(wijCalculada);
+        historico.add(normalizada);
     }
     public void calcularUltimaTabla(){
         normalizarWij();
@@ -200,5 +218,17 @@ public class TFIDF {
 
     public Map<String, ArrayList<Map<String, Double>>> getWijCalculada() {
         return wijCalculada;
+    }
+
+    public ArrayList<Rank> getRanking() {
+        return ranking;
+    }
+
+    public ArrayList<Map<String, ArrayList<Map<String, Double>>>> getHistorico() {
+        return historico;
+    }
+
+    public Map<String,Double[]> getHistoricoTerm() {
+        return historicoTerm;
     }
 }

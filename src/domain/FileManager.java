@@ -210,14 +210,14 @@ public class FileManager {
     }
 
 
-    public void saveConsulta(Map<String, Integer> map,String path)
+    public void saveRanking(ArrayList<Rank> rank,String path)
     {
         try{
             File fileOne=new File(path);
             FileOutputStream fos=new FileOutputStream(fileOne);
             ObjectOutputStream oos=new ObjectOutputStream(fos);
 
-            oos.writeObject(map);
+            oos.writeObject(rank);
             oos.flush();
             oos.close();
             fos.close();
@@ -242,6 +242,74 @@ public class FileManager {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+    public void saveHistorial(ArrayList<Map<String,ArrayList<Map<String,Double>>>> map,String path)
+    {
+        try{
+            File fileOne=new File(path);
+            FileOutputStream fos=new FileOutputStream(fileOne);
+            ObjectOutputStream oos=new ObjectOutputStream(fos);
+
+            oos.writeObject(map);
+            oos.flush();
+            oos.close();
+            fos.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public ArrayList<Map<String,ArrayList<Map<String,Double>>>> readHistorial(String path){
+        //read from file
+        try{
+            File toRead=new File(path);
+            FileInputStream fis=new FileInputStream(toRead);
+            ObjectInputStream ois=new ObjectInputStream(fis);
+
+            ArrayList<Map<String,ArrayList<Map<String,Double>>>> mapInFile=(ArrayList<Map<String,ArrayList<Map<String,Double>>>>)ois.readObject();
+
+            ois.close();
+            fis.close();
+            //print All data in MAP
+
+            return mapInFile;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public void saveHistorialTermino(Map<String,Double[]> map,String path)
+    {
+        try{
+            File fileOne=new File(path);
+            FileOutputStream fos=new FileOutputStream(fileOne);
+            ObjectOutputStream oos=new ObjectOutputStream(fos);
+
+            oos.writeObject(map);
+            oos.flush();
+            oos.close();
+            fos.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+    public Map<String,Double[]> readHistorialTermino(String path){
+        //read from file
+        try{
+            File toRead=new File(path);
+            FileInputStream fis=new FileInputStream(toRead);
+            ObjectInputStream ois=new ObjectInputStream(fis);
+
+            Map<String,Double[]> mapInFile=(Map<String,Double[]>)ois.readObject();
+
+            ois.close();
+            fis.close();
+            //print All data in MAP
+
+            return mapInFile;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
     public void printDiccionarioGeneral(Map<String,ArrayList<VectorialStruct>> p ){
         ArrayList<String> aaa = new ArrayList<>(p.keySet());
@@ -279,25 +347,54 @@ public class FileManager {
             e.printStackTrace();
         }
         return null;
-
     }
-        public TreeMap<String,Integer> readConsulta(String path){
+        public ArrayList<Rank> readRanking(String path){
         //read from file
         try{
             File toRead=new File(path);
             FileInputStream fis=new FileInputStream(toRead);
             ObjectInputStream ois=new ObjectInputStream(fis);
 
-            TreeMap<String,Integer> mapInFile=(TreeMap<String,Integer>)ois.readObject();
+            ArrayList<Rank> ranks=(ArrayList<Rank>) ois.readObject();
 
             ois.close();
             fis.close();
             //print All data in MAP
-            return mapInFile;
+            return ranks;
         }catch(Exception e){
             e.printStackTrace();
         }
         return null;
     }
+    public void createHTML(String path,ArrayList<Rank> ranking,Map<String,String> ch200,int cantidad){
+        FileWriter fWriter = null;
+        BufferedWriter writer = null;
+        try {
+            fWriter = new FileWriter(path+"\\Ranking.html");
+            writer = new BufferedWriter(fWriter);
+            writer.write("<header>");
+            writer.newLine();
+            writer.write("<style> h1{ color:black light} h2 {color: green} </style>");
+            writer.write("<h1> Ranking de archivos. </h1>");
+            int fin = ranking.size();
+            if(ranking.size()>cantidad)fin=cantidad;
+            for(int i=0;i<fin;i++){
+                Rank r = ranking.get(i);
+                writer.write("<h2> Rank: "+(i+1)+"</h2>");
+                writer.newLine();
+                writer.write("<h3> Path: "+r.getPathDoc()+"</h3>");
+                writer.newLine();
+                writer.write("<h3> Text: "+ch200.get(r.getPathDoc())+"</h3>");
+                System.out.println(ch200.get(r.getPathDoc()).length());
+                writer.newLine();
+            }
+            writer.write("</header>");
+             //this is not actually needed for html files - can make your code more readable though
+            writer.close(); //make sure you close the writer object
+        } catch (Exception e) {
+            //catch any exceptions here
+        }
+    }
+
 
 }

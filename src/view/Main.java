@@ -7,22 +7,25 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hola joseph");
-        primaryStage.setScene(new Scene(root, 423, 466));
+        primaryStage.setTitle("Recuperacion textual");
+        primaryStage.setScene(new Scene(root, 423, 586));
         primaryStage.show();
     }
 
 
     public static void main(String[] args)throws FileNotFoundException {
 
-        FileManager test = new FileManager();
+        //FileManager test = new FileManager();
 
       //  test.showFiles("C:\\Users\\Joseph Salas\\Desktop\\TEC\\VI Semestre\\Información Textual\\Tarea programada 1\\man-es");
         //test.createMap();

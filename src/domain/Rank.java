@@ -1,6 +1,8 @@
 package domain;
 
-public class Rank implements Comparable{
+import java.io.Serializable;
+
+public class Rank implements Comparable, Serializable {
     private String pathDoc;
     private Double value;
 
